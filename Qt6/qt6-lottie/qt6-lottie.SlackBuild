@@ -1,0 +1,171 @@
+#!/bin/bash
+
+# Slackware build script for qt6-lottie
+
+# Copyright 2024 Vijay Marcel
+# All rights reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+
+#       http://www.apache.org/licenses/LICENSE-2.0
+
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+cd $(dirname $0) ; CWD=$(pwd)
+
+PRGNAM=qt6-lottie
+VERSION=${VERSION:-6.8.1}
+BUILD=${BUILD:-1}
+TAG=${TAG:-_lec}
+PKGTYPE=${PKGTYPE:-tbz}
+SRCNAM=${SRCNAM:-qtlottie-everywhere-src}
+nprocr=$(expr $(nproc) + 1)
+sys_arch=${sys_arch:-$(uname -m)}
+
+case "$sys_arch" in
+      i686) export ARCH=i686 ;;
+	x86_64) export ARCH=x86_64 ;;
+	     *) echo "This SlackBuild will not run on $sys_arch platform" && exit 1 ;;
+esac
+
+if [ ! -z "${PRINT_PACKAGE_NAME}" ]; then
+  echo "$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.$PKGTYPE"
+  exit 0
+fi
+
+TMP=${TMP:-/tmp/SBo}
+PKG=$TMP/package-$PRGNAM
+OUTPUT=${OUTPUT:-/tmp}
+
+if [ "$ARCH" = "i686" ]; then
+  SLKCFLAGS="-march=pentium4 -mtune=generic -pipe -O2 -fPIC"
+  LIBDIRSUFFIX=""
+  SLKLDFLAGS="-L/opt/lib -L/opt/lib/gstreamer-1.0 -L/opt/qt6/lib"
+elif [ "$ARCH" = "x86_64" ]; then
+  SLKCFLAGS="-march=x86-64 -mtune=generic -pipe -O2 -fPIC"
+  LIBDIRSUFFIX="64"
+  SLKLDFLAGS="-L/opt/lib64 -L/opt/lib64/gstreamer-1.0 -L/opt/qt6/lib64"
+else
+ echo "This SlackBuild will not run on $sys_arch platform" && exit 1
+fi
+
+set -e
+trap 'echo "$0 FAILED at line $LINENO!" | tee -a $OUTPUT/error-${PRGNAM}.log' ERR
+
+rm -rf $PKG
+mkdir -p $TMP $PKG $OUTPUT
+cd $TMP
+rm -rf $SRCNAM-$VERSION
+tar xvf $CWD/$SRCNAM-$VERSION.tar.xz
+cd $SRCNAM-$VERSION
+chown -R root:root .
+find -L . \
+ \( -perm 777 -o -perm 775 -o -perm 750 -o -perm 711 -o -perm 555 \
+  -o -perm 511 \) -exec chmod 755 {} \; -o \
+ \( -perm 666 -o -perm 664 -o -perm 640 -o -perm 600 -o -perm 444 \
+  -o -perm 440 -o -perm 400 \) -exec chmod 644 {} \;
+
+export CC=gcc
+export CXX=g++
+export ld=/usr/bin/ld
+export CFLAGS="$SLKCFLAGS"
+export CXXFLAGS="$SLKCFLAGS"
+export LDFLAGS="$SLKLDFLAGS"
+
+export c1=${c1:-/opt/bin}
+export c2=${c2:-/opt/share}
+export c3=${c3:-$c2/include}
+export c4=${c4:-$c2/aclocal}
+export c5=${c5:-$c2/Modules}
+export c6=${c6:-$c2/Templates}
+export l=${l:-/opt/lib${LIBDIRSUFFIX}}
+export l1=${l1:-$l/pkgconfig}
+export l2=${l2:-$l/cmake}
+export i=${i:-/opt/include}
+export i1=${i1:-$i/lensfun}
+
+export q1=${q1:-/opt/qt6}
+export q2=${q2:-$q1/bin}
+export q3=${q3:-$q1/lib${LIBDIRSUFFIX}}
+export q4=${q4:-$q3/pkgconfig}
+export q5=${q5:-$q1/include}
+export q6=${q6:-$q1/libexec}
+export q7=${q7:-$q1/share}
+export q8=${q8:-$q1/translations}
+export q9=${q9:-$q1/doc}
+export qa=${qa:-$q9/config}
+export qb=${qb:-$q9/global}
+export qde=${qde:-$q9/examples}
+
+export PATH=$c1:$c2:$c3:$c4:$c5:$c6:$l:$l1:$l2:$i:$i1:$q1:$q2:$q3:$q4:$q5:$q6:$q7:$q8:$q9:$qa:$qb:$qde:$PATH
+export PKG_CONFIG_PATH=$l:$l1:$q4:$c3:$PKG_CONFIG_PATH
+export LD_LIBRARY_PATH=$l:$q3:$LD_LIBRARY_PATH
+
+mkdir -pv $PKG/opt/qt6
+mkdir -pv $PKG/opt/qt6/bin
+mkdir -pv $PKG/opt/qt6/include
+mkdir -pv $PKG/opt/qt6/libexec
+mkdir -pv $PKG/opt/qt6/doc/examples
+mkdir -pv $PKG/opt/qt6/include
+mkdir -pv $PKG/opt/qt6/lib${LIBDIRSUFFIX}
+mkdir -pv $PKG/opt/qt6/lib${LIBDIRSUFFIX}/plugins
+mkdir -pv $PKG/opt/qt6/lib${LIBDIRSUFFIX}/qml
+mkdir -pv $PKG/opt/qt6/lib${LIBDIRSUFFIX}/tests
+mkdir -pv $PKG/opt/qt6/share
+mkdir -pv $PKG/opt/qt6/translations
+
+cmake --version
+ld -v
+
+cmake -B build -S $TMP/$SRCNAM-$VERSION -G Ninja \
+    -DCMAKE_C_FLAGS:STRING="$SLKCFLAGS" \
+    -DCMAKE_C_FLAGS_RELEASE:STRING="$SLKCFLAGS" \
+    -DCMAKE_CXX_FLAGS:STRING="$SLKCFLAGS" \
+    -DCMAKE_CXX_FLAGS_RELEASE:STRING="$SLKCFLAGS" \
+    -DCMAKE_SHARED_LINKER_FLAGS:STRING="$SLKLDFLAGS" \
+    -DCMAKE_MODULE_PATH:STRING=/opt/share/Modules \
+    -DCMAKE_INSTALL_PREFIX=/opt \
+    -DINSTALL_BINDIR=/opt/qt6/bin \
+    -DINSTALL_PUBLICBINDIR=/opt/qt6/bin \
+    -DINSTALL_LIBDIR=/opt/qt6/lib${LIBDIRSUFFIX} \
+    -DINSTALL_PLUGINSDIR=/opt/qt6/lib${LIBDIRSUFFIX}/plugins \
+    -DINSTALL_LIBEXECDIR=/opt/qt6/libexec \
+    -DINSTALL_QMLDIR=/opt/qt6/lib${LIBDIRSUFFIX}/qml \
+    -DINSTALL_DOCDIR=/opt/qt6/doc \
+    -DINSTALL_ARCHDATADIR=/opt/qt6/lib${LIBDIRSUFFIX} \
+    -DINSTALL_SBOMDIR=/opt/qt6/lib${LIBDIRSUFFIX}/sbom \
+    -DINSTALL_DATADIR=/opt/qt6/share \
+    -DINSTALL_TRANSLATIONSDIR=/opt/qt6/share/translations \
+    -DINSTALL_INCLUDEDIR=/opt/qt6/include \
+    -DINSTALL_MKSPECSDIR=/opt/qt6/lib${LIBDIRSUFFIX}/mkspecs \
+    -DINSTALL_EXAMPLESDIR=/opt/qt6/doc/examples \
+    -DINSTALL_TESTSDIR=/opt/qt6/lib${LIBDIRSUFFIX}/tests \
+    -DCMAKE_BUILD_TYPE=Release \
+
+cmake --build build --parallel $nprocr
+DESTDIR="$PKG" cmake --install build
+
+# Don't ship .la files:
+rm -f $PKG/{,opt/}lib${LIBDIRSUFFIX}/*.la
+
+find $PKG -print0 | xargs -0 file | grep -e "executable" -e "shared object" | grep ELF \
+  | cut -f 1 -d : | xargs strip --strip-unneeded --remove-section=.comment --remove-section=.note 2> /dev/null || true
+
+# Fix the path in prl files:
+find "$PKG/opt/qt6/lib${LIBDIRSUFFIX}" -type f -name '*.prl' -exec sed -i -e '/^QMAKE_PRL_BUILD_DIR/d;s/\(QMAKE_PRL_LIBS =\).*/\1/' {} \;
+
+mkdir -pv $PKG/usr/doc/$PRGNAM-$VERSION
+cp -a LICENSES  $PKG/usr/doc/$PRGNAM-$VERSION
+cat $CWD/$PRGNAM.SlackBuild > $PKG/usr/doc/$PRGNAM-$VERSION/$PRGNAM.SlackBuild
+
+mkdir -pv $PKG/install
+cat $CWD/slack-desc > $PKG/install/slack-desc
+
+cd $PKG
+/sbin/makepkg -l y -c n --remove-rpaths --remove-tmp-rpaths $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.$PKGTYPE

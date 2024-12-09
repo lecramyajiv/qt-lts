@@ -1,0 +1,255 @@
+#!/bin/bash
+
+# Slackware build script for qt6-base
+
+# Copyright 2024 Vijay Marcel
+# All rights reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+
+# http://www.apache.org/licenses/LICENSE-2.0
+
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+cd $(dirname $0) ; CWD=$(pwd)
+
+PRGNAM=qt6-base
+VERSION=${VERSION:-6.8.1}
+BUILD=${BUILD:-1}
+TAG=${TAG:-_lec}
+PKGTYPE=${PKGTYPE:-tbz}
+SRCNAM=${SRCNAM:-qtbase-everywhere-src}
+nprocr=$(expr $(nproc) + 1)
+sys_arch=${sys_arch:-$(uname -m)}
+
+case "$sys_arch" in
+      i686) export ARCH=i686 ;;
+	x86_64) export ARCH=x86_64 ;;
+	     *) echo "This SlackBuild will not run on $sys_arch platform" && exit 1 ;;
+esac
+
+if [ ! -z "${PRINT_PACKAGE_NAME}" ]; then
+  echo "$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.$PKGTYPE"
+  exit 0
+fi
+
+TMP=${TMP:-/tmp/SBo}
+PKG=$TMP/package-$PRGNAM
+OUTPUT=${OUTPUT:-/tmp}
+
+if [ "$ARCH" = "i686" ]; then
+  SCFLAGS="-march=pentium4 -mtune=generic -pipe -O2 -fPIC"
+  LIBDIRSUFFIX=""
+  SLKLDFLAGS="-L/opt/lib -L/opt/lib/gstreamer-1.0"
+elif [ "$ARCH" = "x86_64" ]; then
+  SCFLAGS="-march=x86-64 -mtune=generic -pipe -O2 -fPIC"
+  LIBDIRSUFFIX="64"
+  SLKLDFLAGS="-L/opt/lib64 -L/opt/lib64/gstreamer-1.0"
+else
+ echo "This SlackBuild will not run on $sys_arch platform" && exit 1
+fi
+
+set -e
+trap 'echo "$0 FAILED at line $LINENO!" | tee -a $OUTPUT/error-${PRGNAM}.log' ERR
+
+rm -rf $PKG
+mkdir -p $TMP $PKG $OUTPUT
+cd $TMP
+rm -rf $SRCNAM-$VERSION
+tar xvf $CWD/$SRCNAM-$VERSION.tar.xz
+cd $SRCNAM-$VERSION
+chown -R root:root .
+find -L . \
+ \( -perm 777 -o -perm 775 -o -perm 750 -o -perm 711 -o -perm 555 \
+  -o -perm 511 \) -exec chmod 755 {} \; -o \
+ \( -perm 666 -o -perm 664 -o -perm 640 -o -perm 600 -o -perm 444 \
+  -o -perm 440 -o -perm 400 \) -exec chmod 644 {} \;
+
+export CC=gcc
+export CXX=g++
+export ld=/usr/bin/ld
+
+export c1=${c1:-/opt/bin}
+export c2=${c2:-/opt/share}
+export c3=${c3:-$c2/include}
+export c4=${c4:-$c2/aclocal}
+export c5=${c5:-$c2/Modules}
+export c6=${c6:-$c2/Templates}
+export l=${l:-/opt/lib${LIBDIRSUFFIX}}
+export l1=${l1:-$l/pkgconfig}
+export l2=${l2:-$l/cmake}
+export i=${i:-/opt/include}
+export i1=${i1:-$i/lensfun}
+
+# use latest vulkan
+
+export v1=${v1:-$i/vulkan}
+export va=${va:-$v1/utility}
+export v2=${v2:-$i/vma}
+export v3=${v3:-$i/vk_video}
+export v4=${v4:-$i/spirv_cross}
+export v5=${v5:-$i/spirv-tools}
+export v6=${v6:-$i/SPIRV-Reflect}
+export vb=${vb:-$v6/include/spirv/unified1}
+export v7=${v7:-$i/spirv}
+export vc=${vc:-$v7/1.0}
+export vd=${vc:-$v7/1.1}
+export ve=${vc:-$v7/1.2}
+export vf=${vc:-$v7/unified1}
+export v8=${v8:-$i/slang}
+export v9=${v9:-$i/shaderc}
+export vg=${vg:-$i/dxc}
+export vh=${vh:-$i/glslang}
+export vj=${vj:-$vh/Include}
+export vk=${vk:-$vh/MachineIndependent}
+export vl=${vl:-$vh/Public}
+export vm=${vm:-$vh/SPIRV}
+
+# Qt6 needs latest gstreamer
+
+export g0=${g0:-$i/gstreamer-1.0}
+export g=${g:-$i/gstreamer-1.0/gst}
+export g1=${g1:-$g/base}
+export g2=${g2:-$g/check}
+export g3=${g3:-$g/controller}
+export g4=${g4:-$g/net}
+export g5=${g5:-$l/girepository-1.0}
+export g6=${g6:-$l/gstreamer-1.0}
+export g7=${g7:-/opt/libexec/gstreamer-1.0}
+export g8=${g8:-$i/GL}
+export g9=${g9:-/opt/lib64/gstreamer-1.0/include/gst/gl}
+export ga=${ga:-$g/allocators}
+export gb=${gb:-$g/analytics}
+export gc=${gc:-$g/app}
+export gd=${gd:-$g/audio}
+export ge=${ge:-$g/basecamerabinsrc}
+export gf=${gf:-$g/codecparsers}
+export gg=${ge:-$g/fft}
+export gh=${ge:-$g/gl}
+export gi=${gi:-$g/insertbin}
+export gj=${gj:-$g/interfaces}
+export gk=${ge:-$g/isoff}
+export gl=${gl:-$g/mpegts}
+export gm=${gm:-$g/mse}
+export gn=${gn:-$g/opencv}
+export go=${go:-$g/pbutils}
+export gp=${gp:-$g/play}
+export gq=${gq:-$g/player}
+export gr=${gr:-$g/riff}
+export gs=${ge:-$g/rtp}
+export gt=${gt:-$g/rtsp}
+export gu=${gu:-$g/sctp}
+export gv=${gv:-$g/sdp}
+export gw=${gw:-$g/tag}
+export gx=${gx:-$g/transcoder}
+export gy=${gy:-$g/uridownloader}
+export gz=${ge:-$g/va}
+export gaa=${gaa:-$g/video}
+export gab=${gab:-$g/vulkan}
+export gac=${gac:-$g/webrtc}
+
+# use latest ffmpeg
+
+export f1=${f1:-$i/libavcodec}
+export f2=${f2:-$i/libavdevice}
+export f3=${f3:-$i/libavfilter}
+export f4=${f4:-$i/libavformat}
+export f5=${f5:-$i/libavutil}
+export f6=${f6:-$i/libpostproc}
+export f7=${f7:-$i/libswresample}
+export f8=${f8:-$i/libswscale}
+
+export PATH=$c1:$c2:$c3:$c4:$c5:$c6:$l:$l1:$l2:$i:$i1:$PATH
+export PKG_CONFIG_PATH=$l:$l1:$PKG_CONFIG_PATH
+export LD_LIBRARY_PATH=$l:$LD_LIBRARY_PATH
+
+#SLKCFLAGS="$SCFLAGS -I$g0 -I$g -I$g2 -I$g3 -I$g4 -I$g5 -I$g6 -I$g8 -I$g9 -I$ga -I$gb -I$gc -I$gd -I$ge -I$gf -I$gg -I$gh -I$gi -I$gj -I$gk -I$gl -I$gm -I$gn -I$go -I$gp -I$gq -I$gr -I$gs -I$gt -I$gu -I$gv -I$gw -I$gx -I$gy -I$gz -I$gaa -I$gab -I$gac -I$v1 -I$v2 -I$v3 -I$v4 -I$v5 -I$v6 -I$v7 -I$v8 -I$v9 -I$va -I$vb -I$vc -I$vd -I$ve -I$vf -I$vg -I$vh -I$vj -I$vk -I$vl -I$vm -I$f1 -I$f2 -I$f3 -I$f4 -I$f5 -I$f6 -I$f7 -I$f8"
+
+SLKCFLAGS="$SCFLAGS"
+
+export CFLAGS="$SLKCFLAGS"
+export CXXFLAGS="$SLKCFLAGS"
+export LDFLAGS="$SLKLDFLAGS"
+
+cmake --version
+ld -v
+
+mkdir -pv $PKG/opt/qt6
+mkdir -pv $PKG/opt/qt6/bin
+mkdir -pv $PKG/opt/qt6/include
+mkdir -pv $PKG/opt/qt6/libexec
+mkdir -pv $PKG/opt/qt6/doc/examples
+mkdir -pv $PKG/opt/qt6/include
+mkdir -pv $PKG/opt/qt6/lib${LIBDIRSUFFIX}
+mkdir -pv $PKG/opt/qt6/lib${LIBDIRSUFFIX}/plugins
+mkdir -pv $PKG/opt/qt6/lib${LIBDIRSUFFIX}/qml
+mkdir -pv $PKG/opt/qt6/lib${LIBDIRSUFFIX}/tests
+mkdir -pv $PKG/opt/qt6/share
+mkdir -pv $PKG/opt/qt6/translations
+
+# From  Slackware Qt6 SlackBuild
+# Use our custom compiler and linker flags:
+sed -e "s|^\(QMAKE_CFLAGS_RELEASE.*\)|\1 ${SLKCFLAGS}|" -i mkspecs/common/gcc-base.conf || exit 1
+sed -e "s|^\(QMAKE_LFLAGS_RELEASE.*\)|\1 ${SLKLDFLAGS}|" -i mkspecs/common/g++-unix.conf || exit 1
+
+cmake -B build -S $TMP/$SRCNAM-$VERSION -G Ninja  \
+    -DCMAKE_C_FLAGS:STRING="$SLKCFLAGS" \
+    -DCMAKE_C_FLAGS_RELEASE:STRING="$SLKCFLAGS" \
+    -DCMAKE_CXX_FLAGS:STRING="$SLKCFLAGS" \
+    -DCMAKE_CXX_FLAGS_RELEASE:STRING="$SLKCFLAGS" \
+    -DCMAKE_SHARED_LINKER_FLAGS:STRING="$SLKLDFLAGS" \
+    -DCMAKE_MODULE_PATH:STRING=/opt/share/Modules \
+    -DCMAKE_INSTALL_PREFIX=/opt \
+    -DINSTALL_BINDIR=/opt/qt6/bin \
+    -DINSTALL_PUBLICBINDIR=/opt/qt6/bin \
+    -DINSTALL_LIBDIR=/opt/qt6/lib${LIBDIRSUFFIX} \
+    -DINSTALL_PLUGINSDIR=/opt/qt6/lib${LIBDIRSUFFIX}/plugins \
+    -DINSTALL_LIBEXECDIR=/opt/qt6/libexec \
+    -DINSTALL_QMLDIR=/opt/qt6/lib${LIBDIRSUFFIX}/qml \
+    -DINSTALL_DOCDIR=/opt/qt6/doc \
+    -DINSTALL_ARCHDATADIR=/opt/qt6/lib${LIBDIRSUFFIX} \
+    -DINSTALL_SBOMDIR=/opt/qt6/lib${LIBDIRSUFFIX}/sbom \
+    -DINSTALL_DATADIR=/opt/qt6/share \
+    -DINSTALL_TRANSLATIONSDIR=/opt/qt6/share/translations \
+    -DINSTALL_INCLUDEDIR=/opt/qt6/include \
+    -DINSTALL_MKSPECSDIR=/opt/qt6/lib${LIBDIRSUFFIX}/mkspecs \
+    -DINSTALL_EXAMPLESDIR=/opt/qt6/doc/examples \
+    -DINSTALL_TESTSDIR=/opt/qt6/lib${LIBDIRSUFFIX}/tests \
+    -DFEATURE_journald=OFF \
+    -DFEATURE_libproxy=ON \
+    -DFEATURE_openssl_linked=ON \
+    -DFEATURE_system_sqlite=ON \
+    -DFEATURE_system_xcb_xinput=ON \
+    -DFEATURE_no_direct_extern_access=OFF \
+    -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=ON \
+    -DCMAKE_MESSAGE_LOG_LEVEL=STATUS \
+    -DCMAKE_BUILD_TYPE=Release \
+
+cmake --build build --parallel $nprocr
+DESTDIR="$PKG" cmake --install build
+
+# Don't ship .la files:
+rm -f $PKG/{,usr/}lib${LIBDIRSUFFIX}/*.la
+
+find $PKG -print0 | xargs -0 file | grep -e "executable" -e "shared object" | grep ELF \
+  | cut -f 1 -d : | xargs strip --strip-unneeded --remove-section=.comment --remove-section=.note 2> /dev/null || true
+
+# Fix the path in prl files:
+find "$PKG/opt/qt6/lib${LIBDIRSUFFIX}" -type f -name '*.prl' -exec sed -i -e '/^QMAKE_PRL_BUILD_DIR/d;s/\(QMAKE_PRL_LIBS =\).*/\1/' {} \;
+
+mkdir -p $PKG/usr/doc/$PRGNAM-$VERSION
+cp -av LICENSES $PKG/usr/doc/$PRGNAM-$VERSION
+cat $CWD/$PRGNAM.SlackBuild > $PKG/usr/doc/$PRGNAM-$VERSION/$PRGNAM.SlackBuild
+
+mkdir -p $PKG/install
+cat $CWD/slack-desc > $PKG/install/slack-desc
+
+cd $PKG
+/sbin/makepkg -l y -c n --remove-rpaths --remove-tmp-rpaths $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.$PKGTYPE
+

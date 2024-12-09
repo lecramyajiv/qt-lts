@@ -1,0 +1,12 @@
+PRGNAM="qtcreator"
+VERSION="15.0.0"
+HOMEPAGE="https://qt.io"
+DOWNLOAD="https://download.qt.io/official_releases/qtcreator/15.0/15.0.0/qt-creator-opensource-src-15.0.0.tar.xz
+          https://download.qt.io/development_releases/prebuilt/libclang/qt/libclang-release_18.1.7-based-linux-Rhel8.10-gcc10.0-x86_64.7z"
+MD5SUM="01c2e452721f81d070081eb2f8416ad0
+        264c68365dc2c7c4fc56c3b8b66d31e8"
+DOWNLOAD_x86_64=""
+MD5SUM_x86_64=""
+REQUIRES=""
+MAINTAINER="Vijay Marcel"
+EMAIL="vijaymarcel@outlook.com"

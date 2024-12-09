@@ -1,0 +1,12 @@
+PRGNAM="qt6-tools"
+VERSION="6.8.1"
+HOMEPAGE="https://qt.io"
+DOWNLOAD="https://download.qt.io/official_releases/qt/6.8/6.8.1/submodules/qttools-everywhere-src-6.8.1.tar.xz
+          https://download.qt.io/development_releases/prebuilt/libclang/qt/libclang-release_18.1.7-based-linux-Rhel8.10-gcc10.0-x86_64.7z"
+MD5SUM="2d42dae67950712b3f43ba07a52d3062
+        264c68365dc2c7c4fc56c3b8b66d31e8"
+DOWNLOAD_x86_64=""
+MD5SUM_x86_64=""
+REQUIRES="qt6-base qt6-declarative"
+MAINTAINER="Vijay Marcel"
+EMAIL="vijaymarcel@outlook.com"

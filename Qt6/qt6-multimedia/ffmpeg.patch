@@ -1,0 +1,11 @@
+--- FindFFmpeg.cmake	2024-11-22 13:01:25.000000000 +0530
++++ FindFFmpeg1.cmake	2024-12-05 23:04:11.418792000 +0530
+@@ -255,7 +255,7 @@
+ 
+     # The pkgconfig directory is always in lib/pkgconfig/, even on Windows
+     # where libs and dlls are in bin/
+-    set(PC_FILE ${${_component}_LIBRARY_DIR}/../lib/pkgconfig/lib${lib}.pc)
++    set(PC_FILE ${${_component}_LIBRARY_DIR}/pkgconfig/lib${lib}.pc)
+ 
+     if(EXISTS ${PC_FILE})
+         file(READ ${PC_FILE} pcfile)
