@@ -18,11 +18,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 cd $(dirname $0) ; CWD=$(pwd)
 
 PRGNAM=qt6-imageformats
-VERSION=${VERSION:-6.8.0}
+VERSION=${VERSION:-6.8.1}
 BUILD=${BUILD:-1}
 TAG=${TAG:-_lec}
 PKGTYPE=${PKGTYPE:-tbz}
